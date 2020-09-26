@@ -3,7 +3,7 @@ extends layout
 block content
   h1 Title: #{book.title}
 
-  p #[strong Author:]
+  p #[strong Author: ]
     a(href=book.author.url) #{book.author.name}
   p #[strong Summary:] #{book.summary}
   p #[strong ISBN:] #{book.isbn}
