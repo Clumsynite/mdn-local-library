@@ -1,11 +1,11 @@
 const { body, validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
-const author = require('../models/author')
+const Author = require('../models/author')
 const async = require('async')
 const Book = require('../models/book')
 
 exports.author_list = (req, res, next) => {
-  author.find()
+  Author.find()
   .populate('author')
   .sort([['family_name', 'ascending']])
   .exec(function(err, list_authors) {
@@ -18,7 +18,7 @@ exports.author_detail = (req, res) => {
   
   async.parallel({
     author: function(callback) {
-        author.findById(req.params.id)
+      Author.findById(req.params.id)
           .exec(callback)
     },
     authors_books: function(callback) {
@@ -58,7 +58,7 @@ exports.author_create_post = [
       res.render('author_form', {title: 'Create Author', author: req.body, errors: errors})
       return
     }else {
-      const authorData = new author({
+      const authorData = new Author({
         first_name: req.body.first_name,
         family_name: req.body.family_name,
         date_of_birth: req.body.date_of_birth,
@@ -73,12 +73,44 @@ exports.author_create_post = [
   }
 ]
 
-exports.author_delete_get = (req, res) => {
-  res.send('NOT IMPLEMENTED: Author delete GET')
+exports.author_delete_get = (req, res, next) => {
+  async.parallel({
+    author: function(callback) {
+      Author.findById(req.params.id).exec(callback)
+    },
+    author_books: function(callback) {
+      Book.find({'author': req.params.id}).exec(callback)
+    },
+  }, function(err, results) {
+    if(err) { return next(err) }
+    if(results.author===null) {
+      res.redirect('/catalog/authors')
+    }
+    res.render('author_delete', {title: 'Delete Author', author: results.author, author_books: results.author_books})
+  })
 }
 
-exports.author_delete_post = (req, res) => {
-  res.send('NOT IMPLEMENTED: Author delete POST')
+exports.author_delete_post = (req, res, next) => {
+  async.parallel({
+    author: function(callback) {
+      Author.findById(req.body.id).exec(callback)
+    },
+    author_books: function(callback) {
+      Book.find({'author': req.params.id}).exec(callback)
+    },
+  }, function(err, results) {
+    if(err) { return next(err) }
+    if(results.author_books.length > 0) {
+      res.render('author_delete', { title: 'Delete Author', author: results.author, author_books: results.author_books } );
+      return;
+    }else {
+      Author.findByIdAndRemove(req.body.authorid, function deleteAuthor(err) {
+          if (err) { return next(err); }
+          // Success - go to author list
+          res.redirect('/catalog/authors')
+      })
+  }
+  })
 }
 
 
