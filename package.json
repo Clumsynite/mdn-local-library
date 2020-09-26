@@ -1,6 +1,11 @@
 {
   "name": "express-locallibrary-tutorial",
-  "version": "0.0.0",
+  "description": "Built this by following MDN's local library tutorial",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Clumsynite/mdn-local-library"
+  },
   "private": true,
   "author": "Clumsyknight",
   "scripts": {
