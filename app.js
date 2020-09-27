@@ -8,6 +8,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const catalogRouter = require('./routes/catalog')
 const compression = require('compression')
+const helmet = require('helmet')
 
 var app = express();
 
@@ -20,6 +21,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(compression()); //Compress all routes
+app.use(helmet())
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
