@@ -2,6 +2,9 @@
   "name": "express-locallibrary-tutorial",
   "description": "Built this by following MDN's local library tutorial",
   "version": "1.0.0",
+  "engines": {
+    "node": "v12.17.0"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Clumsynite/mdn-local-library"
