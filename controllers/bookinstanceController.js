@@ -2,7 +2,7 @@ const { body,validationResult } = require('express-validator/check');
 const { sanitizeBody } = require('express-validator/filter');
 const BookInstance = require('../models/bookinstance');
 const Book = require('../models/book')
-
+const async = require('async')
 // Display list of all BookInstances.
 exports.bookinstance_list = function(req, res, next) {
     BookInstance.find()
@@ -99,11 +99,60 @@ exports.bookinstance_delete_post = function(req, res, next) {
 };
 
 // Display BookInstance update form on GET.
-exports.bookinstance_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: BookInstance update GET');
+exports.bookinstance_update_get = function(req, res, next) {
+
+  async.parallel({
+    book: function(callback) {
+        Book.find({}, 'title').exec(callback);
+    },
+    book_instance: function(callback) {
+        BookInstance.findById(req.params.id).exec(callback)
+    },
+  }, function(err, results) {
+      if (err) { return next(err); }
+      if (results.book_instance==null) { // No results.
+          var err = new Error('BookInstance not found');
+          err.status = 404;
+          return next(err);
+      }
+      res.render('bookinstance_form', { title: 'Update BookInstance', book_list: results.book, bookinstance: results.book_instance });
+  });
 };
 
 // Handle bookinstance update on POST.
-exports.bookinstance_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: BookInstance update POST');
-};
+exports.bookinstance_update_post = [
+  body('book', 'Book must be specified').trim().isLength({min: 1}),
+  body('imprint', 'Imprint must be specified').trim().isLength({min: 1}),
+  body('due_back', 'Invalid date').optional({checkFalsy: true}).isISO8601(),
+
+  sanitizeBody('book').escape(),
+  sanitizeBody('imprint').escape(),
+  sanitizeBody('status').trim().escape(),
+  sanitizeBody('due_back').toDate(),
+
+  (req, res, next) => {
+    const errors = validationResult(req)
+
+    const bookinstance = new BookInstance({
+      book: req.body.book,
+      imprint: req.body.imprint,
+      status: req.body.status,
+      due_back: req.body.due_back,
+      _id: req.params.id
+    })
+
+    if(!errors.isEmpty()) {
+      Book.find({}, 'title')
+      .exec((err, books) => {
+        if (err) { return next(err) }
+        res.render('bookinstance_form', { title: 'Update BookInstance', book_list: books, selected_book: bookinstance.book._id, errors: errors.array(), bookinstance: bookinstance, status: bookinstance.status })
+      })
+      return
+    }else {
+      BookInstance.findByIdAndUpdate(req.params.id, bookinstance, {}, (err, instance) => {
+        if (err) { return next(err) }
+        res.redirect(instance.url)
+      })
+    }
+  }
+]
