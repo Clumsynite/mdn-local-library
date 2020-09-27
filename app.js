@@ -45,7 +45,8 @@ app.use(function(err, req, res, next) {
 });
 
 const mongoose = require('mongoose')
-const mongoDB = 'mongodb://clumsy:clumsyknight@cluster2-shard-00-00.zcv6x.mongodb.net:27017,cluster2-shard-00-01.zcv6x.mongodb.net:27017,cluster2-shard-00-02.zcv6x.mongodb.net:27017/local_library?ssl=true&replicaSet=atlas-zlk7rr-shard-0&authSource=admin&retryWrites=true&w=majority'
+const dev_db_url = 'mongodb://clumsy:clumsyknight@cluster2-shard-00-00.zcv6x.mongodb.net:27017,cluster2-shard-00-01.zcv6x.mongodb.net:27017,cluster2-shard-00-02.zcv6x.mongodb.net:27017/local_library?ssl=true&replicaSet=atlas-zlk7rr-shard-0&authSource=admin&retryWrites=true&w=majority'
+const mongoDB = process.env.MONGODB_URI || dev_db_url
 
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true })
 
