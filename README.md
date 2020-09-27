@@ -2,9 +2,11 @@
 
 ## Introduction
 
-This app is built by following [this](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website) tutorial on MDN.
+The Local Library app is built by following [this](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/Tutorial_local_library_website) tutorial on MDN.
 
-This tutorial basically explains steps to setup a node development environment and guides through creating a CRUD app with express and various other libraries, to Deploying it online.
+This tutorial basically explains steps to setup a node development environment and guides through creating a CRUD app with express and various other libraries, and Deploying it online.
+
+You can visit the live version [here](https://mdn-local-lib.herokuapp.com/)
 
 ## Commands
 
